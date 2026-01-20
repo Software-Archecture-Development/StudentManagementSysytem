@@ -27,7 +27,17 @@ router.post("/student", async (req, res) => {
     //Fetch the list of students
     const students = await fetchStudents();
     const student = students.find((s) => s.email === email);
-    //
+    // Verify the student exists
+    if (!student) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+    // Verify the password matches
+    const isMatch = await bcrypt.compare(password, student.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+    //if not throw an correct error message
+    //-----
     //if this dose not match throw an error
 
     const token = generateJWTWithPrivateKey({
