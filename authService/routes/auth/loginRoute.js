@@ -101,6 +101,7 @@ module.exports = router;
 //     const token = generateJWTWithPrivateKey({
 //       id: professor._id,
 //       roles: [ROLES.PROFESSOR]
+//sub roles: [SUBROLES.PROFESSOR]
 //.       COURSE_INSTRUCTOR: "COURSE_INSTRUCTOR"
 //         LECTURER: "LECTURER",
 //         EXAMINER: "EXAMINER",
