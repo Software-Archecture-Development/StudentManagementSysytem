@@ -15,7 +15,7 @@ const { ROLES } = require("../../consts");
 // Create a new enrollment
 router.post(
   "/",
-  verifyRole([ROLES.ADMIN, ROLES.PROFESSOR]),
+  verifyRole([ROLES.ADMIN, ROLES.PROFESSOR, ROLES.ENROLLMENT_SERVICE]),
   async (req, res) => {
     try {
       const { student, course } = req.body;
@@ -45,6 +45,7 @@ router.post(
 
       res.status(201).json(enrollment);
     } catch (error) {
+      console.log(error);
       // Handle duplicate enrollment error
       if (error.code === 11000) {
         return res.status(409).json({
@@ -57,13 +58,13 @@ router.post(
         message: error.message || "Unable to create enrollement",
       });
     }
-  },
+  }
 );
 
 // Get all enrollments
 router.get(
   "/",
-  verifyRole([ROLES.ADMIN, ROLES.PROFESSOR]),
+  verifyRole([ROLES.ADMIN, ROLES.PROFESSOR, ROLES.ENROLLMENT_SERVICE]),
   async (req, res) => {
     try {
       const enrollments = await Enrollment.find();
@@ -73,7 +74,7 @@ router.get(
         message: "Server Error: Unable to fetch enrollments",
       });
     }
-  },
+  }
 );
 
 // Get a specific enrollment by ID with expanded student and course object (no populate or Student model)
@@ -93,7 +94,7 @@ router.get(
       // Fetch all students and find the matching one
       const students = await fetchStudents();
       const student = students.find(
-        (s) => s._id.toString() === enrollmentObj.student.toString(),
+        (s) => s._id.toString() === enrollmentObj.student.toString()
       );
       if (student) {
         enrollmentObj.student = student;
@@ -102,7 +103,7 @@ router.get(
       // Fetch all courses and find the matching one
       const courses = await fetchCourses();
       const course = courses.find(
-        (c) => c._id.toString() === enrollmentObj.course.toString(),
+        (c) => c._id.toString() === enrollmentObj.course.toString()
       );
       if (course) {
         enrollmentObj.course = course;
@@ -119,7 +120,7 @@ router.get(
         message: "Server Error: Unable to fetch enrollment",
       });
     }
-  },
+  }
 );
 
 // Get enrollment by student ID
@@ -142,7 +143,7 @@ router.get(
       enrollments = enrollments.map((enrollment) => {
         const enrollmentObj = enrollment.toObject(); // Convert to plain object if it's a Mongoose document
         const course = courses.find(
-          (course) => course._id.toString() === enrollmentObj.course.toString(),
+          (course) => course._id.toString() === enrollmentObj.course.toString()
         );
         if (course) {
           enrollmentObj.course = course; // Replace course ID with the full course object
@@ -156,7 +157,7 @@ router.get(
         message: "Server Error: Unable to fetch enrollments for student",
       });
     }
-  },
+  }
 );
 
 // Delete an enrollment by ID
@@ -184,7 +185,7 @@ router.delete(
         message: "Server Error: Unable to delete enrollment",
       });
     }
-  },
+  }
 );
 
 module.exports = router;

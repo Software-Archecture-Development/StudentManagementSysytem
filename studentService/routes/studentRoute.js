@@ -5,12 +5,42 @@ const Student = require("../models/student");
 const { verifyRole, restrictStudentToOwnData } = require("./auth/util");
 const { ROLES } = require("../../consts");
 
-const router = express.Router();
+const router = express.Router(); // Create end point for student routes
+const { studentServiceLogger: logger } = require("../../logging");
+
+router.get(
+  "/",
+  verifyRole([
+    ROLES.PROFESSOR,
+    ROLES.ADMIN,
+    ROLES.AUTH_SERVICE,
+    ROLES.ENROLLMENT_SERVICE,
+  ]),
+  async (req, res) => {
+    try {
+      const students = await Student.find();
+      logger.info("All Students Fetched");
+      return res.json(students);
+    } catch (error) {
+      logger.error(error);
+      res.status(500).json({
+        message: "Server Error: Unable to fetch students",
+        //correlationId: getCorrelationId(),
+      });
+    }
+  }
+);
 
 // verifyRole([ROLES.STUDENT])
 router.post(
   "/",
-  verifyRole([ROLES.STUDENT, ROLES.PROFESSOR, ROLES.ADMIN, ROLES.AUTH_SERVICE]),
+  verifyRole([
+    ROLES.STUDENT,
+    ROLES.PROFESSOR,
+    ROLES.ADMIN,
+    ROLES.AUTH_SERVICE,
+    ROLES.ENROLLMENT_SERVICE,
+  ]),
   async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -37,7 +67,13 @@ router.post(
 // verifyRole([ROLES.PROFESSOR])
 router.get(
   "/",
-  verifyRole([ROLES.STUDENT, ROLES.PROFESSOR, ROLES.ADMIN, ROLES.AUTH_SERVICE]),
+  verifyRole([
+    ROLES.STUDENT,
+    ROLES.PROFESSOR,
+    ROLES.ADMIN,
+    ROLES.AUTH_SERVICE,
+    ROLES.ENROLLMENT_SERVICE,
+  ]),
   async (req, res) => {
     try {
       const students = await Student.find();
